@@ -13,11 +13,11 @@ public class JUnit5DemoTest {
 
     @Test
     public void TestA() {
-        System.out.println("Running Test A");
+        System.out.println("[JUnit5] Running Test A");
     }
 
     @Test
     public void TestB() {
-        System.out.println("Running Test B");
+        System.out.println("[JUnit5] Running Test B");
     }
 }

@@ -6,7 +6,7 @@ The [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs two test cas
 
 Sample output:
 
-```bash
+```shell
 $ mvn compile exec:java -Dexec.mainClass="com.luojl.demo.TestRunner" -Dexec.classpathScope="test"
 
 (...)
