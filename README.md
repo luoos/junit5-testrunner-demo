@@ -2,7 +2,7 @@
 
 This is a demo project that shows how to use JUnit 5 to run test cases programmatically.
 
-The [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs two test cases in [JUnit5DemoTest.java](src/test/java/com/luojl/demo/JUnit5DemoTest.java) with two different orders.
+The [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs test in four rounds. The first two rounds use JUnit 5 API to run JUnit 5 tests in two different orders, the actual execution order is expected. The second two rounds use JUnit 5 API to run JUnit 4 tests in two different orders, but the actual execution order is unexpected. Refer to the [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) for defailts.
 
 Sample output:
 
@@ -11,37 +11,25 @@ $ mvn compile exec:java -Dexec.mainClass="com.luojl.demo.TestRunner" -Dexec.clas
 
 (...)
 
-Running Test A
-Running Test B
+# round 1. expected order: C, B, A
+[JUnit5] Running Test C
+[JUnit5] Running Test B
+[JUnit5] Running Test A
 
-Test run finished after 84 ms
-[         2 containers found      ]
-[         0 containers skipped    ]
-[         2 containers started    ]
-[         0 containers aborted    ]
-[         2 containers successful ]
-[         0 containers failed     ]
-[         2 tests found           ]
-[         0 tests skipped         ]
-[         2 tests started         ]
-[         0 tests aborted         ]
-[         2 tests successful      ]
-[         0 tests failed          ]
+# round 2. expected order: A, C, B
+[JUnit5] Running Test A
+[JUnit5] Running Test C
+[JUnit5] Running Test B
 
-Running Test B
-Running Test A
+# round 3. expected order: C, B, A (failed)
+[JUnit4] running Test A
+[JUnit4] running Test B
+[JUnit4] running Test C
 
-Test run finished after 3 ms
-[         2 containers found      ]
-[         0 containers skipped    ]
-[         2 containers started    ]
-[         0 containers aborted    ]
-[         2 containers successful ]
-[         0 containers failed     ]
-[         2 tests found           ]
-[         0 tests skipped         ]
-[         2 tests started         ]
-[         0 tests aborted         ]
+# round 4. expected order: A, C, B (failed)
+[JUnit4] running Test A
+[JUnit4] running Test B
+[JUnit4] running Test C
 
 (...)
 ```

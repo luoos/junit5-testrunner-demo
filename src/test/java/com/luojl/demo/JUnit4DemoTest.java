@@ -20,4 +20,9 @@ public class JUnit4DemoTest {
     public void TestB4() {
         System.out.println("[JUnit4] running Test B");
     }
+
+    @Test
+    public void TestC4() {
+        System.out.println("[JUnit4] running Test C");
+    }
 }

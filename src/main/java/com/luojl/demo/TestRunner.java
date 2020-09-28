@@ -20,6 +20,7 @@ public class TestRunner {
             TestExecutionListener listener) {
         // The execution order is same as order in 'methods' variable.
         // So changing the order in 'methods' variable can change the test order
+        // (the above statement is true for JUnit 5 test cases, but not for JUnit 4)
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(methods).build();
         Launcher launcher = LauncherFactory.create();
@@ -38,18 +39,38 @@ public class TestRunner {
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
         PrintWriter stdOutWriter = new PrintWriter(System.out);
 
-        // First round: TestA runs first, then TestB
-        List<String> testMethodStrs = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestA",
-                "com.luojl.demo.JUnit5DemoTest#TestB");
-        runMultipleTestMethods(toMethodSelectors(testMethodStrs), listener);
-        listener.getSummary().printTo(stdOutWriter);
-
-        // Second round: TestB runs first, then TestA
-        List<String> reversedTestMethodStrs = Arrays.asList(
+        // [First round] The actual order is expected and it's C, B, A
+        List<String> junit5TestCases = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#TestC",
                 "com.luojl.demo.JUnit5DemoTest#TestB",
                 "com.luojl.demo.JUnit5DemoTest#TestA");
-        runMultipleTestMethods(toMethodSelectors(reversedTestMethodStrs), listener);
+        runMultipleTestMethods(toMethodSelectors(junit5TestCases), listener);
+        listener.getSummary().printTo(stdOutWriter);
+
+        // [Second round] The actual order is expected and it's A, C, B
+        List<String> junit5TestCasesV2 = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#TestA",
+                "com.luojl.demo.JUnit5DemoTest#TestC",
+                "com.luojl.demo.JUnit5DemoTest#TestB");
+        runMultipleTestMethods(toMethodSelectors(junit5TestCasesV2), listener);
+        listener.getSummary().printTo(stdOutWriter);
+
+        // [Third round] the actual order is unexpected
+        // Actual: A, B, C; Expected: C, B, A
+        List<String> junit4TestCases = Arrays.asList(
+                "com.luojl.demo.JUnit4DemoTest#TestC4",
+                "com.luojl.demo.JUnit4DemoTest#TestB4",
+                "com.luojl.demo.JUnit4DemoTest#TestA4");
+        runMultipleTestMethods(toMethodSelectors(junit4TestCases), listener);
+        listener.getSummary().printTo(stdOutWriter);
+
+        // [Fourth round] the actual order is unexpected
+        // Actual: A, B, C; Expected: A, C, B
+        List<String> junit4TestCasesV2 = Arrays.asList(
+                "com.luojl.demo.JUnit4DemoTest#TestA4",
+                "com.luojl.demo.JUnit4DemoTest#TestC4",
+                "com.luojl.demo.JUnit4DemoTest#TestB4");
+        runMultipleTestMethods(toMethodSelectors(junit4TestCasesV2), listener);
         listener.getSummary().printTo(stdOutWriter);
     }
 }

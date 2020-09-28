@@ -20,4 +20,9 @@ public class JUnit5DemoTest {
     public void TestB() {
         System.out.println("[JUnit5] Running Test B");
     }
+
+    @Test
+    public void TestC() {
+        System.out.println("[JUnit5] Running Test C");
+    }
 }
