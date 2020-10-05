@@ -2,6 +2,7 @@ package com.luojl.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class JUnit5DemoTest {
@@ -22,6 +23,7 @@ public class JUnit5DemoTest {
     }
 
     @Test
+    @DisplayName("CC")
     public void TestC() {
         System.out.println("[JUnit5] Running Test C");
     }
