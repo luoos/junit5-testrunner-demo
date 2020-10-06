@@ -76,9 +76,9 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#TestB",
                 "com.luojl.demo.JUnit5DemoTest#TestA");
         List<String> actualOrder = Arrays.asList(
-            "com.luojl.demo.JUnit5DemoTest#TestC",
-            "com.luojl.demo.JUnit5DemoTest#TestB",
-            "com.luojl.demo.JUnit5DemoTest#TestA");
+                "com.luojl.demo.JUnit5DemoTest#TestC",
+                "com.luojl.demo.JUnit5DemoTest#TestB",
+                "com.luojl.demo.JUnit5DemoTest#TestA");
         TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
         Assertions.assertIterableEquals(
