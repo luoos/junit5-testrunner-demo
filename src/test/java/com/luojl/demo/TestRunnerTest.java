@@ -65,4 +65,66 @@ public class TestRunnerTest {
         TestRunner.runMultipleTestMethodStrs(junit4TestCases, listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
+
+    @Test
+    public void runDisableTests() {
+        // disabled test will be skipped
+        TestOrderListener listener = new TestOrderListener();
+        List<String> junit5TestCases = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#TestC",
+                "com.luojl.demo.JUnit5DemoTest#disabledTest",
+                "com.luojl.demo.JUnit5DemoTest#TestB",
+                "com.luojl.demo.JUnit5DemoTest#TestA");
+        List<String> actualOrder = Arrays.asList(
+            "com.luojl.demo.JUnit5DemoTest#TestC",
+            "com.luojl.demo.JUnit5DemoTest#TestB",
+            "com.luojl.demo.JUnit5DemoTest#TestA");
+        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
+        Assertions.assertIterableEquals(
+                Arrays.asList("com.luojl.demo.JUnit5DemoTest#disabledTest"),
+                listener.getSkippedTest());
+    }
+
+    @Test
+    public void runTestsWithOrderAnnotation() {
+        // The actual order is dominated by Order annotation
+        // test with smaller Order value runs first
+        TestOrderListener listener = new TestOrderListener();
+        List<String> junit5TestCases = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10");
+        List<String> actualOrder = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10");
+        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
+    }
+
+    @Test
+    public void runTestsWithOrderAnnotationMultipleClasses() {
+        System.out.println("runTestsWithOrderAnnotationMultipleClasses");
+        // The actual order is dominated by Order annotation
+        // Tests in same class will be grouped together.
+        // Test with smaller Order value runs first
+        TestOrderListener listener = new TestOrderListener();
+        List<String> junit5TestCases = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4");
+        List<String> actualOrder = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6");
+        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
+    }
 }
