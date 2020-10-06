@@ -2,7 +2,13 @@
 
 This is a demo project that shows how to use JUnit 5 to run test cases programmatically.
 
-The [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs test in four rounds. The first two rounds use JUnit 5 API to run JUnit 5 tests in two different orders, the actual execution order is expected. The second two rounds use JUnit 5 API to run JUnit 4 tests in two different orders, but the actual execution order is unexpected. Refer to [TestRunnerTest](src/test/java/com/luojl/demo/TestRunnerTest.java) for details.
+[TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs tests with JUnit 5 API.
+
+[TestRunnerTest](src/test/java/com/luojl/demo/TestRunnerTest.java) use *TestRunner* to run tests. Some observations:
+
+1. For JUnit 5 tests in same class, the execution order is the same with order in the given *list*, refer to [TestRunnerTest.runJUnit5TestsRound1](src/test/java/com/luojl/demo/TestRunnerTest.java#L11) and [TestRunnerTest.runJUnit5TestsRound2](src/test/java/com/luojl/demo/TestRunnerTest.java#L22) for details.
+2. For JUnit 5 tests with different class, tests in same class will be grouped together and test order in the same class is preserved, refer to [TestRunnerTest.runJUnit5TestsRound1](src/test/java/com/luojl/demo/TestRunnerTest.java#L11) and [TestRunnerTest.runJUnit5TestsInterleaved](src/test/java/com/luojl/demo/TestRunnerTest.java#L33) for details.
+3. If we run JUnit 4 tests with JUnit 5 API, the execution order is sorted alphabetically according to the test method names. Refer to [TestRunnerTest.runJUnit4TestsRound1](src/test/java/com/luojl/demo/TestRunnerTest.java#L11) and [TestRunnerTest.runJUnit5TestsInterleaved](src/test/java/com/luojl/demo/TestRunnerTest.java#L54) for details.
 
 ## Useful References
 
