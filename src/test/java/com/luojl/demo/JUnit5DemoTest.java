@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 @TestMethodOrder(OrderAnnotation.class)
 public class JUnit5DemoTest {
 
+    private static int flakyInt = 0;
+
     @Test
     public void SimpleTest() {
         assertEquals("Hey there", "Hey there");
@@ -55,5 +57,17 @@ public class JUnit5DemoTest {
     @Order(10)
     public void testWithOrder10() {
         System.out.println("test with order 10");
+    }
+
+    @Test
+    public void flakytest1() {
+        assertEquals(0, this.flakyInt);
+        this.flakyInt += 1;
+    }
+
+    @Test
+    public void flakytest2() {
+        // flakytest1 should run first, otherwise this will fail
+        assertEquals(1, this.flakyInt);
     }
 }
