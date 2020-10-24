@@ -14,8 +14,11 @@ public class TestOrderListener implements TestExecutionListener {
 
     // Order matters!
     private List<SingleTestResult> testResults;
-
     private List<SingleTestResult> skippedTests;
+
+    public TestOrderListener() {
+        reset();
+    }
 
     public List<SingleTestResult> getResults() {
         return this.testResults;
@@ -36,11 +39,13 @@ public class TestOrderListener implements TestExecutionListener {
                    .collect(Collectors.toList());
     }
 
-    @Override
-    public void testPlanExecutionStarted(TestPlan testPlan) {
-        this.testResults = new ArrayList<>();
+    public void reset() {
+        this.testResults  = new ArrayList<>();
         this.skippedTests = new ArrayList<>();
     }
+
+    @Override
+    public void testPlanExecutionStarted(TestPlan testPlan) {}
 
     @Override
     public void executionFinished(TestIdentifier testIdentifier,

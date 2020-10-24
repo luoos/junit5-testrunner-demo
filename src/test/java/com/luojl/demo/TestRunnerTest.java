@@ -1,8 +1,11 @@
 package com.luojl.demo;
 
+import static com.luojl.demo.TestRunner.toMethodSelectors;
+
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class TestRunnerTest {
@@ -14,8 +17,10 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#TestC",
                 "com.luojl.demo.JUnit5DemoTest#TestB",
                 "com.luojl.demo.JUnit5DemoTest#TestA");
-        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
-        Assertions.assertIterableEquals(junit5TestCases, listener.getTestOrder());
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
+                                    listener);
+        Assertions.assertIterableEquals(junit5TestCases,
+                                        listener.getTestOrder());
     }
 
     @Test
@@ -25,13 +30,16 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#TestA",
                 "com.luojl.demo.JUnit5DemoTest#TestC",
                 "com.luojl.demo.JUnit5DemoTest#TestB");
-        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
-        Assertions.assertIterableEquals(junit5TestCases, listener.getTestOrder());
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
+                                    listener);
+        Assertions.assertIterableEquals(junit5TestCases,
+                                        listener.getTestOrder());
     }
 
     @Test
     public void runJUnit5TestsInterleaved() {
-        // The actual order is unexpected, tests in same class will be grouped together
+        // The actual order is unexpected, tests in same class will be
+        // grouped together.
         // But order in the same class is preserved
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestFromTwoClasses = Arrays.asList(
@@ -46,7 +54,8 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#TestA",
                 "com.luojl.demo.JUnit5DemoTest2#TestC",
                 "com.luojl.demo.JUnit5DemoTest2#TestA");
-        TestRunner.runMultipleTestMethodStrs(junit5TestFromTwoClasses, listener);
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestFromTwoClasses),
+                                    listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
 
@@ -62,7 +71,8 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit4DemoTest#TestA4",
                 "com.luojl.demo.JUnit4DemoTest#TestB4",
                 "com.luojl.demo.JUnit4DemoTest#TestC4");
-        TestRunner.runMultipleTestMethodStrs(junit4TestCases, listener);
+        TestRunner.runMultipleTests(toMethodSelectors(junit4TestCases),
+                                    listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
 
@@ -79,7 +89,8 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#TestC",
                 "com.luojl.demo.JUnit5DemoTest#TestB",
                 "com.luojl.demo.JUnit5DemoTest#TestA");
-        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
+                                    listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
         Assertions.assertIterableEquals(
                 Arrays.asList("com.luojl.demo.JUnit5DemoTest#disabledTest"),
@@ -99,13 +110,13 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
                 "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
                 "com.luojl.demo.JUnit5DemoTest#testWithOrder10");
-        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
+                                    listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
 
     @Test
     public void runTestsWithOrderAnnotationMultipleClasses() {
-        System.out.println("runTestsWithOrderAnnotationMultipleClasses");
         // The actual order is dominated by Order annotation
         // Tests in same class will be grouped together.
         // Test with smaller Order value runs first
@@ -124,7 +135,90 @@ public class TestRunnerTest {
                 "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
                 "com.luojl.demo.JUnit5DemoTest2#testWithOrder4",
                 "com.luojl.demo.JUnit5DemoTest2#testWithOrder6");
-        TestRunner.runMultipleTestMethodStrs(junit5TestCases, listener);
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
+                                    listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
+
+    @Test
+    public void runJUnit4TestsSeparately() {
+        TestOrderListener listener = new TestOrderListener();
+        List<String> junit4Tests = Arrays.asList(
+                "com.luojl.demo.JUnit4DemoTest#TestC4",
+                "com.luojl.demo.JUnit4DemoTest#TestB4",
+                "com.luojl.demo.JUnit4DemoTest#TestA4");
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(junit4Tests),
+                                              listener);
+        Assertions.assertIterableEquals(junit4Tests, listener.getTestOrder());
+    }
+
+    @Test
+    public void runMixedTestsSeparately() {
+        TestOrderListener listener = new TestOrderListener();
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.JUnit4DemoTest#TestC4",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6",
+                "com.luojl.demo.JUnit5DemoTest#TestC",
+                "com.luojl.demo.JUnit4DemoTest#TestA4",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
+                "com.luojl.demo.JUnit4DemoTest#TestB4",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2");
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
+                                              listener);
+        Assertions.assertIterableEquals(tests, listener.getTestOrder());
+    }
+
+    @Test
+    @Disabled
+    public void comparePerformance() {
+        // Run all in a single TestPlan vs separate TestPlan
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.JUnit4DemoTest#junit4SimpleTest",
+                "com.luojl.demo.JUnit4DemoTest#TestA4",
+                "com.luojl.demo.JUnit4DemoTest#TestB4",
+                "com.luojl.demo.JUnit4DemoTest#TestC4",
+                "com.luojl.demo.JUnit5DemoTest#SimpleTest",
+                "com.luojl.demo.JUnit5DemoTest#TestA",
+                "com.luojl.demo.JUnit5DemoTest#TestB",
+                "com.luojl.demo.JUnit5DemoTest#TestC",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
+                "com.luojl.demo.JUnit5DemoTest2#TestA",
+                "com.luojl.demo.JUnit5DemoTest2#TestB",
+                "com.luojl.demo.JUnit5DemoTest2#TestC",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6");
+
+        // warm up
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
+                                              listener);
+        listener.reset();
+        TestRunner.runMultipleTests(toMethodSelectors(tests),
+                                    listener);
+
+        // run separately - 82ms
+        long start = System.currentTimeMillis();
+        listener.reset();
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
+                                              listener);
+        long end = System.currentTimeMillis();
+        long separateTime = end - start;
+
+        // run together - 33 ms
+        start = System.currentTimeMillis();
+        listener.reset();
+        TestRunner.runMultipleTests(toMethodSelectors(tests),
+                                    listener);
+        end = System.currentTimeMillis();
+        long togetherTime = end - start;
+
+        System.out.println("separate testplan, time: " + separateTime);
+        System.out.println("single testplan, time: " + togetherTime);
+    }
+
 }

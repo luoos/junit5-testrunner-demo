@@ -12,26 +12,41 @@ import org.junit.platform.launcher.core.LauncherFactory;
 
 public class TestRunner {
 
-    public static void runMultipleTestMethodStrs(List<String> fullQualifiedMethodNames,
-                                                 TestExecutionListener listener) {
-        runMultipleTestMethods(toMethodSelectors(fullQualifiedMethodNames), listener);
-    }
-
-    public static void runMultipleTestMethods(List<MethodSelector> methods,
-                                              TestExecutionListener listener) {
-        // The execution order is same as order in 'methods' variable.
-        // So changing the order in 'methods' variable can change the test order
-        // (the above statement is true for JUnit 5 test cases, but not for JUnit 4)
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(methods).build();
+    public static void runMultipleTests(List<MethodSelector> methods,
+                                        TestExecutionListener listener) {
+        // The execution order is same as order in 'methods' variable, unless:
+        // 1. run JUnit4 tests. They will be sorted alphabetically
+        // 2. JUnit5 tests with different classes interleaved,
+        //    like ClassA#test1, ClassB#test1, ClassA#test2,
+        //    the actual order is ClassA#test1, ClassA#test2, ClassB#test1
+        // 3. JUnit5 tests with Order annotation.
+        //    No matter how I shuffle the order, the actual order depends on
+        //    the value of Order annotation.
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder
+                .request().selectors(methods).build();
         Launcher launcher = LauncherFactory.create();
         launcher.execute(request, listener);
     }
 
-    private static List<MethodSelector> toMethodSelectors(List<String> fullQualifiedMethodNames) {
+    public static void runMultipleTestsSeparately(
+            List<MethodSelector> methods,
+            TestExecutionListener listener) {
+        // The execution order is strictly equals to the order
+        // in methods variable
+        Launcher launcher = LauncherFactory.create();
+        for (MethodSelector method : methods) {
+            LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder
+                    .request().selectors(method).build();
+            launcher.execute(request, listener);
+        }
+    }
+
+    public static List<MethodSelector> toMethodSelectors(
+            List<String> fullQualifiedMethodNames) {
         // The item in the list should be full qualified method name,
         // i.e., <package>.<class>#<method>
-        return fullQualifiedMethodNames.stream().map(s -> DiscoverySelectors.selectMethod(s))
+        return fullQualifiedMethodNames.stream()
+                .map(s -> DiscoverySelectors.selectMethod(s))
                 .collect(Collectors.toList());
     }
 }
