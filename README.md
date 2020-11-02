@@ -1,5 +1,7 @@
 # JUnit 5 Test Runner Demo
 
+![](https://github.com/luoos/junit5-testrunner-demo/workflows/Java-CI-with-Maven/badge.svg)
+
 This is a demo project that shows how to use JUnit 5 to run test cases programmatically.
 
 [TestRunner](src/main/java/com/luojl/demo/TestRunner.java) runs tests with JUnit 5 API.
