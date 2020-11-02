@@ -1,6 +1,6 @@
-# JUnit 5 Test Runner Demo
+![](https://github.com/luoos/junit5-testrunner-demo/workflows/maven-test/badge.svg)
 
-![](https://github.com/luoos/junit5-testrunner-demo/workflows/Java-CI-with-Maven/badge.svg)
+# JUnit 5 Test Runner Demo
 
 This is a demo project that shows how to use JUnit 5 to run test cases programmatically.
 
