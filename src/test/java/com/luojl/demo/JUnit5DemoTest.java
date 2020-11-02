@@ -2,6 +2,8 @@ package com.luojl.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -12,7 +14,19 @@ import org.junit.jupiter.api.Test;
 @TestMethodOrder(OrderAnnotation.class)
 public class JUnit5DemoTest {
 
-    private static int flakyInt = 0;
+    private static int flakyStaticInt = 0;
+    private static int flakyStaticInt2 = 0;
+    private int flakyInt = 10;
+
+    @BeforeAll
+    static void initAll() {
+        System.out.println("[JUnit5] BeforeAll");
+    }
+
+    @BeforeEach
+    void init() {
+        System.out.println("[JUnit5] BeforeEach. This: " + this);
+    }
 
     @Test
     public void SimpleTest() {
@@ -61,13 +75,27 @@ public class JUnit5DemoTest {
 
     @Test
     public void flakytest1() {
-        assertEquals(0, this.flakyInt);
-        this.flakyInt += 1;
+        assertEquals(0, this.flakyStaticInt);
+        this.flakyStaticInt += 1;
     }
 
     @Test
     public void flakytest2() {
         // flakytest1 should run first, otherwise this will fail
-        assertEquals(1, this.flakyInt);
+        assertEquals(1, this.flakyStaticInt);
+    }
+
+    @Test
+    public void testIncreaseVal() {
+        flakyStaticInt2 += 1;
+        this.flakyInt += 1;
+        System.out.println("increase flakyInt to " + this.flakyInt);
+        System.out.println("increase flakyStaticInt2 to " + this.flakyStaticInt2);
+    }
+
+    @Test
+    public void testCheckVal() {
+        System.out.println("flakyInt: " + this.flakyInt);
+        System.out.println("flakyStaticInt2: " + flakyStaticInt2);
     }
 }

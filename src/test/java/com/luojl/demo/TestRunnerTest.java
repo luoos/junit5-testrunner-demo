@@ -221,4 +221,61 @@ public class TestRunnerTest {
         System.out.println("single testplan, time: " + togetherTime);
     }
 
+    @Test
+    public void testBeforeAllAndEachRunSeparately() {
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal",
+                "com.luojl.demo.JUnit5DemoTest#testCheckVal");
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
+                                              listener);
+        Assertions.assertIterableEquals(tests, listener.getTestOrder());
+
+        /**
+         * Output: (run separately)
+         *      [JUnit5] BeforeAll
+         *      [JUnit5] BeforeEach. This: com.luojl.demo.JUnit5DemoTest@2fd1433e
+         *      increase flakyInt to 11
+         *      increase flakyStaticInt2 to 1
+         *      [JUnit5] BeforeAll
+         *      [JUnit5] BeforeEach. This: com.luojl.demo.JUnit5DemoTest@383bfa16
+         *      flakyInt: 10
+         *      flakyStaticInt2: 1
+         *
+         * BeforeAll will be invoked for each test when running separately
+         * 2 tests, 2 BeforeAll, 2 BeforeEach
+         *
+         * Use the same static variable
+         * non-static vaiable will be reset for each test
+         */
+    }
+
+    @Test
+    public void testBeforeAllAndEachRunTogether() {
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal",
+                "com.luojl.demo.JUnit5DemoTest#testCheckVal");
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTests(toMethodSelectors(tests),
+                                    listener);
+        Assertions.assertIterableEquals(tests, listener.getTestOrder());
+
+        /**
+         * Output: (run together)
+         *      [JUnit5] BeforeAll
+         *      [JUnit5] BeforeEach. This: com.luojl.demo.JUnit5DemoTest@793be5ca
+         *      increase flakyInt to 11
+         *      increase flakyStaticInt2 to 1
+         *      [JUnit5] BeforeEach. This: com.luojl.demo.JUnit5DemoTest@78123e82
+         *      flakyInt: 10
+         *      flakyStaticInt2: 1
+         *
+         * BeforeAll just runs once
+         * 2 tests, 1 BeforeAll, 2 BeforeEach
+         *
+         * Use the same static variable
+         * non-static vaiable will be reset for each test
+         */
+    }
+
 }
