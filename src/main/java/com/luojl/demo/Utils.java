@@ -1,7 +1,12 @@
 package com.luojl.demo;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Set;
 
 public class Utils {
     private static final String junit5Regex = "\\[class:([\\w.]+).*\\[method:(\\w+)\\(";
@@ -30,5 +35,21 @@ public class Utils {
         matcher = junit4Pattern.matcher(identifierUniqueId);
         matcher.find();
         return matcher.group(2) + "#" + matcher.group(1);
+    }
+
+    public static List<Method> getAllMethods(Class clz) {
+        List<Method> methods = new ArrayList<>();
+        Set<String> methodNameSet = new HashSet<>();
+        for (; clz != null; clz = clz.getSuperclass()) {
+            for (Method m : clz.getDeclaredMethods()) {
+                if (methodNameSet.contains(m.getName())) {
+                    // exclude override method
+                    continue;
+                }
+                methods.add(m);
+                methodNameSet.add(m.getName());
+            }
+        }
+        return methods;
     }
 }
