@@ -60,23 +60,6 @@ public class TestRunnerTest {
     }
 
     @Test
-    public void runJUnit4TestsRound1() {
-        // The actual order is unexpected, tests are sorted alphabetically
-        TestOrderListener listener = new TestOrderListener();
-        List<String> junit4TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit4DemoTest#TestC4",
-                "com.luojl.demo.JUnit4DemoTest#TestB4",
-                "com.luojl.demo.JUnit4DemoTest#TestA4");
-        List<String> actualOrder = Arrays.asList(
-                "com.luojl.demo.JUnit4DemoTest#TestA4",
-                "com.luojl.demo.JUnit4DemoTest#TestB4",
-                "com.luojl.demo.JUnit4DemoTest#TestC4");
-        TestRunner.runMultipleTests(toMethodSelectors(junit4TestCases),
-                                    listener);
-        Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
-    }
-
-    @Test
     public void runDisableTests() {
         // disabled test will be skipped
         TestOrderListener listener = new TestOrderListener();
@@ -141,27 +124,12 @@ public class TestRunnerTest {
     }
 
     @Test
-    public void runJUnit4TestsSeparately() {
-        TestOrderListener listener = new TestOrderListener();
-        List<String> junit4Tests = Arrays.asList(
-                "com.luojl.demo.JUnit4DemoTest#TestC4",
-                "com.luojl.demo.JUnit4DemoTest#TestB4",
-                "com.luojl.demo.JUnit4DemoTest#TestA4");
-        TestRunner.runMultipleTestsSeparately(toMethodSelectors(junit4Tests),
-                                              listener);
-        Assertions.assertIterableEquals(junit4Tests, listener.getTestOrder());
-    }
-
-    @Test
     public void runMixedTestsSeparately() {
         TestOrderListener listener = new TestOrderListener();
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit4DemoTest#TestC4",
                 "com.luojl.demo.JUnit5DemoTest2#testWithOrder6",
                 "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit4DemoTest#TestA4",
                 "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit4DemoTest#TestB4",
                 "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
                 "com.luojl.demo.JUnit5DemoTest2#testWithOrder2");
         TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
@@ -174,10 +142,6 @@ public class TestRunnerTest {
     public void comparePerformance() {
         // Run all in a single TestPlan vs separate TestPlan
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit4DemoTest#junit4SimpleTest",
-                "com.luojl.demo.JUnit4DemoTest#TestA4",
-                "com.luojl.demo.JUnit4DemoTest#TestB4",
-                "com.luojl.demo.JUnit4DemoTest#TestC4",
                 "com.luojl.demo.JUnit5DemoTest#SimpleTest",
                 "com.luojl.demo.JUnit5DemoTest#TestA",
                 "com.luojl.demo.JUnit5DemoTest#TestB",
