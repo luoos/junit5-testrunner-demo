@@ -242,4 +242,16 @@ public class TestRunnerTest {
          */
     }
 
+    @Test
+    void testRunNestedTests() {
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestB",
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestA",
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestC");
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTests(toMethodSelectors(tests),
+                                    listener);
+        Assertions.assertIterableEquals(tests, listener.getTestOrder());
+    }
+
 }
