@@ -29,13 +29,13 @@ public class TestOrderListener implements TestExecutionListener {
      */
     public List<String> getTestOrder() {
         return this.testResults.stream()
-                   .map(r -> r.getFullQualifiedMethodName())
+                   .map(r -> r.getFullyQualifiedMethodName())
                    .collect(Collectors.toList());
     }
 
     public List<String> getSkippedTest() {
         return this.skippedTests.stream()
-                   .map(r -> r.getFullQualifiedMethodName())
+                   .map(r -> r.getFullyQualifiedMethodName())
                    .collect(Collectors.toList());
     }
 
@@ -97,8 +97,8 @@ public class TestOrderListener implements TestExecutionListener {
             return this.result;
         }
 
-        public String getFullQualifiedMethodName() {
-            return Utils.toFullQualifiedName(this.identifier.getUniqueId());
+        public String getFullyQualifiedMethodName() {
+            return Utils.toFullyQualifiedName(this.identifier.getUniqueId());
         }
     }
 }

@@ -9,15 +9,31 @@ import java.util.regex.Pattern;
 import java.util.Set;
 
 public class Utils {
-    private static final String junit5NestedRegex = "\\[class:([\\w.]+).*\\[nested-class:([\\w.]+).*\\[method:(\\w+)\\(";
+    private static final String junit5NestParameterizedRegex =
+            "\\[class:([\\w.]+).*\\[nested-class:([\\w.]+).*\\[test-template:([\\w().]+).*\\[test-template-invocation:(#\\d)";
+    private static final Pattern junit5NestParameterizedPattern =
+            Pattern.compile(junit5NestParameterizedRegex);
+    private static final String junit5ParameterizedRegex =
+            "\\[class:([\\w.]+).*\\[test-template:([\\w().]+).*\\[test-template-invocation:(#\\d)";
+    private static final Pattern junit5ParameterizedPattern =
+            Pattern.compile(junit5ParameterizedRegex);
+    private static final String junit5NestedRegex = "\\[class:([\\w.]+).*\\[nested-class:([\\w.]+).*\\[method:([\\w().]+)";
     private static final Pattern junit5NestedPattern = Pattern.compile(junit5NestedRegex);
-    private static final String junit5Regex = "\\[class:([\\w.]+).*\\[method:(\\w+)\\(";
+    private static final String junit5Regex = "\\[class:([\\w.]+).*\\[method:([\\w().]+)";
     private static final Pattern junit5Pattern = Pattern.compile(junit5Regex);
     private static final String junit4Regex = "\\[test:(\\w+)\\(([\\w.]+)\\)";
     private static final Pattern junit4Pattern = Pattern.compile(junit4Regex);
 
     /**
      * Turn the uniqueId from identifier into full qualified method name.
+     *
+     * For JUnit 5 nested parameterized tests:
+     * uniqueId: [engine:junit-jupiter]/[class:com.luojl.demo.InheritedTest]/[nested-class:NestedTest]/[test-template:ParameterizedTestA(java.lang.String)]/[test-template-invocation:#2]
+     * fully qualified name: com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#2
+     *
+     * For JUnit 5 parameterized test:
+     * uniqueId: [engine:junit-jupiter]/[class:com.luojl.demo.ParameterizedDemoTest]/[test-template:test1(java.lang.String)]/[test-template-invocation:#1]
+     * fully qualified name: com.luojl.demo.ParameterizedDemoTest#test1(java.lang.String)#1
      *
      * For JUnit 5 nested test:
      * uniqueId: [engine:junit-jupiter]/[class:com.luojl.demo.InheritedTest]/[nested-class:NestedTest]/[method:NestedTestB()]
@@ -31,8 +47,17 @@ public class Utils {
      * uniqueId: [engine:junit-vintage]/[runner:com.luojl.demo.JUnit4DemoTest]/[test:TestA4(com.luojl.demo.JUnit4DemoTest)]
      * fully qualified name: com.luojl.demo.JUnit4DemoTest#TestA4
      */
-    public static String toFullQualifiedName(String identifierUniqueId) {
-        Matcher matcher = junit5NestedPattern.matcher(identifierUniqueId);
+    public static String toFullyQualifiedName(String identifierUniqueId) {
+        Matcher matcher = junit5NestParameterizedPattern.matcher(identifierUniqueId);
+        if (matcher.find()) {
+            return matcher.group(1) + "$" + matcher.group(2) + "#" + matcher.group(3)
+                   + matcher.group(4);
+        }
+        matcher = junit5ParameterizedPattern.matcher(identifierUniqueId);
+        if (matcher.find()) {
+            return matcher.group(1) + "#" + matcher.group(2) + matcher.group(3);
+        }
+        matcher = junit5NestedPattern.matcher(identifierUniqueId);
         if (matcher.find()) {
             return matcher.group(1) + "$" + matcher.group(2) + "#" + matcher.group(3);
         }

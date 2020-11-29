@@ -42,10 +42,10 @@ public class TestRunner {
     }
 
     public static List<MethodSelector> toMethodSelectors(
-            List<String> fullQualifiedMethodNames) {
-        // The item in the list should be full qualified method name,
+            List<String> fullyQualifiedMethodNames) {
+        // The item in the list should be fully qualified method name,
         // i.e., <package>.<class>#<method>
-        return fullQualifiedMethodNames.stream()
+        return fullyQualifiedMethodNames.stream()
                 .map(s -> DiscoverySelectors.selectMethod(s))
                 .collect(Collectors.toList());
     }

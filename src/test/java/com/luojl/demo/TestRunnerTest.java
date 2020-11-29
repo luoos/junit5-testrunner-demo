@@ -1,12 +1,16 @@
 package com.luojl.demo;
 
 import static com.luojl.demo.TestRunner.toMethodSelectors;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
 
 public class TestRunnerTest {
 
@@ -14,26 +18,24 @@ public class TestRunnerTest {
     public void runJUnit5TestsRound1() {
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest#TestA");
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()");
         TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
                                     listener);
-        Assertions.assertIterableEquals(junit5TestCases,
-                                        listener.getTestOrder());
+        Assertions.assertIterableEquals(junit5TestCases, listener.getTestOrder());
     }
 
     @Test
     public void runJUnit5TestsRound2() {
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestA",
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#TestB");
+                "com.luojl.demo.JUnit5DemoTest#TestA()",
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#TestB()");
         TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
                                     listener);
-        Assertions.assertIterableEquals(junit5TestCases,
-                                        listener.getTestOrder());
+        Assertions.assertIterableEquals(junit5TestCases, listener.getTestOrder());
     }
 
     @Test
@@ -43,17 +45,17 @@ public class TestRunnerTest {
         // But order in the same class is preserved
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestFromTwoClasses = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest2#TestC",
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest2#TestA",
-                "com.luojl.demo.JUnit5DemoTest#TestA");
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest2#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest2#TestA()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()");
         List<String> actualOrder = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#TestA",
-                "com.luojl.demo.JUnit5DemoTest2#TestC",
-                "com.luojl.demo.JUnit5DemoTest2#TestA");
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()",
+                "com.luojl.demo.JUnit5DemoTest2#TestC()",
+                "com.luojl.demo.JUnit5DemoTest2#TestA()");
         TestRunner.runMultipleTests(toMethodSelectors(junit5TestFromTwoClasses),
                                     listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
@@ -64,19 +66,18 @@ public class TestRunnerTest {
         // disabled test will be skipped
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#disabledTest",
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest#TestA");
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#disabledTest()",
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()");
         List<String> actualOrder = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest#TestA");
-        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
-                                    listener);
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()");
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases), listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
         Assertions.assertIterableEquals(
-                Arrays.asList("com.luojl.demo.JUnit5DemoTest#disabledTest"),
+                Arrays.asList("com.luojl.demo.JUnit5DemoTest#disabledTest()"),
                 listener.getSkippedTest());
     }
 
@@ -86,15 +87,14 @@ public class TestRunnerTest {
         // test with smaller Order value runs first
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10");
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()");
         List<String> actualOrder = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10");
-        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
-                                    listener);
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()");
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases), listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
 
@@ -105,21 +105,20 @@ public class TestRunnerTest {
         // Test with smaller Order value runs first
         TestOrderListener listener = new TestOrderListener();
         List<String> junit5TestCases = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4");
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4()");
         List<String> actualOrder = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6");
-        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases),
-                                    listener);
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6()");
+        TestRunner.runMultipleTests(toMethodSelectors(junit5TestCases), listener);
         Assertions.assertIterableEquals(actualOrder, listener.getTestOrder());
     }
 
@@ -127,13 +126,12 @@ public class TestRunnerTest {
     public void runMixedTestsSeparately() {
         TestOrderListener listener = new TestOrderListener();
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6",
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2");
-        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
-                                              listener);
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6()",
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2()");
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests), listener);
         Assertions.assertIterableEquals(tests, listener.getTestOrder());
     }
 
@@ -142,42 +140,38 @@ public class TestRunnerTest {
     public void comparePerformance() {
         // Run all in a single TestPlan vs separate TestPlan
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#SimpleTest",
-                "com.luojl.demo.JUnit5DemoTest#TestA",
-                "com.luojl.demo.JUnit5DemoTest#TestB",
-                "com.luojl.demo.JUnit5DemoTest#TestC",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder5",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder3",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit5DemoTest#testWithOrder10",
-                "com.luojl.demo.JUnit5DemoTest2#TestA",
-                "com.luojl.demo.JUnit5DemoTest2#TestB",
-                "com.luojl.demo.JUnit5DemoTest2#TestC",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4",
-                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6");
+                "com.luojl.demo.JUnit5DemoTest#SimpleTest()",
+                "com.luojl.demo.JUnit5DemoTest#TestA()",
+                "com.luojl.demo.JUnit5DemoTest#TestB()",
+                "com.luojl.demo.JUnit5DemoTest#TestC()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder5()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder3()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()",
+                "com.luojl.demo.JUnit5DemoTest#testWithOrder10()",
+                "com.luojl.demo.JUnit5DemoTest2#TestA()",
+                "com.luojl.demo.JUnit5DemoTest2#TestB()",
+                "com.luojl.demo.JUnit5DemoTest2#TestC()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder2()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder4()",
+                "com.luojl.demo.JUnit5DemoTest2#testWithOrder6()");
 
         // warm up
         TestOrderListener listener = new TestOrderListener();
-        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
-                                              listener);
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests), listener);
         listener.reset();
-        TestRunner.runMultipleTests(toMethodSelectors(tests),
-                                    listener);
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
 
         // run separately - 82ms
         long start = System.currentTimeMillis();
         listener.reset();
-        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
-                                              listener);
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests), listener);
         long end = System.currentTimeMillis();
         long separateTime = end - start;
 
         // run together - 33 ms
         start = System.currentTimeMillis();
         listener.reset();
-        TestRunner.runMultipleTests(toMethodSelectors(tests),
-                                    listener);
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
         end = System.currentTimeMillis();
         long togetherTime = end - start;
 
@@ -188,11 +182,10 @@ public class TestRunnerTest {
     @Test
     public void testBeforeAllAndEachRunSeparately() {
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal",
-                "com.luojl.demo.JUnit5DemoTest#testCheckVal");
+                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal()",
+                "com.luojl.demo.JUnit5DemoTest#testCheckVal()");
         TestOrderListener listener = new TestOrderListener();
-        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests),
-                                              listener);
+        TestRunner.runMultipleTestsSeparately(toMethodSelectors(tests), listener);
         Assertions.assertIterableEquals(tests, listener.getTestOrder());
 
         /**
@@ -217,11 +210,10 @@ public class TestRunnerTest {
     @Test
     public void testBeforeAllAndEachRunTogether() {
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal",
-                "com.luojl.demo.JUnit5DemoTest#testCheckVal");
+                "com.luojl.demo.JUnit5DemoTest#testIncreaseVal()",
+                "com.luojl.demo.JUnit5DemoTest#testCheckVal()");
         TestOrderListener listener = new TestOrderListener();
-        TestRunner.runMultipleTests(toMethodSelectors(tests),
-                                    listener);
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
         Assertions.assertIterableEquals(tests, listener.getTestOrder());
 
         /**
@@ -245,13 +237,39 @@ public class TestRunnerTest {
     @Test
     void testRunNestedTests() {
         List<String> tests = Arrays.asList(
-                "com.luojl.demo.InheritedTest$NestedTest#NestedTestB",
-                "com.luojl.demo.InheritedTest$NestedTest#NestedTestA",
-                "com.luojl.demo.InheritedTest$NestedTest#NestedTestC");
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestB()",
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestA()",
+                "com.luojl.demo.InheritedTest$NestedTest#NestedTestC()");
         TestOrderListener listener = new TestOrderListener();
-        TestRunner.runMultipleTests(toMethodSelectors(tests),
-                                    listener);
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
         Assertions.assertIterableEquals(tests, listener.getTestOrder());
+    }
+
+    @Test
+    void testRunParameterizedTests() {
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.ParameterizedDemoTest#TestA(java.lang.String)",
+                "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)",
+                "com.luojl.demo.ParameterizedDemoTest#TestB(java.nio.file.Path)",
+                "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)",
+                "com.luojl.demo.InheritedTest$NestedTest#TestB(java.nio.file.Path)"
+        );
+        List<String> expected = Arrays.asList(
+                "com.luojl.demo.ParameterizedDemoTest#TestA(java.lang.String)#1",
+                "com.luojl.demo.ParameterizedDemoTest#TestA(java.lang.String)#2",
+                "com.luojl.demo.ParameterizedDemoTest#TestA(java.lang.String)#3",
+                "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)#1",
+                "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)#2",
+                "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)#3",
+                "com.luojl.demo.ParameterizedDemoTest#TestB(java.nio.file.Path)",
+                "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#1",
+                "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#2",
+                "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#3",
+                "com.luojl.demo.InheritedTest$NestedTest#TestB(java.nio.file.Path)"
+        );
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
+        Assertions.assertIterableEquals(expected, listener.getTestOrder());
     }
 
 }
