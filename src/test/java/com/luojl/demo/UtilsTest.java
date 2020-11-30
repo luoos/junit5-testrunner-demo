@@ -37,4 +37,22 @@ public class UtilsTest {
         Assertions.assertEquals("java.lang.String,int,java.nio.file.Path",
                                 Utils.getParameterListStr(methods.get(0)));
     }
+
+    @Test
+    void testMatchNestedClassOrder() {
+        // A B C
+        String fakeIdentifierId = "[class:com.package.OuterClass]/[nested-class:ClassA]/[nested-class:ClassB]/[nested-class:ClassC]/[method:method()]";
+        Assertions.assertEquals("com.package.OuterClass$ClassA$ClassB$ClassC#method()",
+                                Utils.toFullyQualifiedName(fakeIdentifierId));
+
+        // B A C
+        fakeIdentifierId = "[class:com.package.OuterClass]/[nested-class:ClassB]/[nested-class:ClassA]/[nested-class:ClassC]/[method:method()]";
+        Assertions.assertEquals("com.package.OuterClass$ClassB$ClassA$ClassC#method()",
+                                Utils.toFullyQualifiedName(fakeIdentifierId));
+
+        // C B A
+        fakeIdentifierId = "[class:com.package.OuterClass]/[nested-class:ClassC]/[nested-class:ClassB]/[nested-class:ClassA]/[method:method()]";
+        Assertions.assertEquals("com.package.OuterClass$ClassC$ClassB$ClassA#method()",
+                                Utils.toFullyQualifiedName(fakeIdentifierId));
+    }
 }

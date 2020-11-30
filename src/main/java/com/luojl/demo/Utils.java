@@ -50,7 +50,6 @@ public class Utils {
      * fully qualified name: com.luojl.demo.JUnit4DemoTest#TestA4
      */
     public static String toFullyQualifiedName(String identifierUniqueId) {
-        System.out.println(identifierUniqueId);
         Matcher matcher = junit5NestParameterizedPattern.matcher(identifierUniqueId);
         if (matcher.find()) {
             return matcher.group(1) + "$" + matcher.group(2) + "#" + matcher.group(3)
