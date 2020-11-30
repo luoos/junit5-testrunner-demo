@@ -1,16 +1,12 @@
 package com.luojl.demo;
 
 import static com.luojl.demo.TestRunner.toMethodSelectors;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
 
 public class TestRunnerTest {
 
@@ -251,6 +247,7 @@ public class TestRunnerTest {
                 "com.luojl.demo.ParameterizedDemoTest#TestA(java.lang.String)",
                 "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)",
                 "com.luojl.demo.ParameterizedDemoTest#TestB(java.nio.file.Path)",
+                "com.luojl.demo.ParameterizedDemoTest#TestC(int)",
                 "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)",
                 "com.luojl.demo.InheritedTest$NestedTest#TestB(java.nio.file.Path)"
         );
@@ -262,6 +259,7 @@ public class TestRunnerTest {
                 "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)#2",
                 "com.luojl.demo.ParameterizedDemoTest#Test1(java.lang.String)#3",
                 "com.luojl.demo.ParameterizedDemoTest#TestB(java.nio.file.Path)",
+                "com.luojl.demo.ParameterizedDemoTest#TestC(int)#1",
                 "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#1",
                 "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#2",
                 "com.luojl.demo.InheritedTest$NestedTest#ParameterizedTestA(java.lang.String)#3",
@@ -270,6 +268,16 @@ public class TestRunnerTest {
         TestOrderListener listener = new TestOrderListener();
         TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
         Assertions.assertIterableEquals(expected, listener.getTestOrder());
+    }
+
+    @Test
+    void testRunDoubleNestedTest() {
+        List<String> tests = Arrays.asList(
+                "com.luojl.demo.InheritedTest$NestedTest$DoubleNestedTest#DoubleNestedTestA()"
+        );
+        TestOrderListener listener = new TestOrderListener();
+        TestRunner.runMultipleTests(toMethodSelectors(tests), listener);
+        Assertions.assertIterableEquals(tests, listener.getTestOrder());
     }
 
 }

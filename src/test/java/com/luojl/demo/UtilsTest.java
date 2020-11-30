@@ -3,7 +3,6 @@ package com.luojl.demo;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,5 +28,13 @@ public class UtilsTest {
             "void com.luojl.demo.GrandParentTest.GrandParentTestC()"
         );
         Assertions.assertTrue(methodNames.containsAll(expectedMethodNames));
+    }
+
+    @Test
+    void testGetParametersOfMethod() {
+        List<Method> methods = Arrays.asList(ParameterizedMethodClass.class.getDeclaredMethods());
+        Assertions.assertTrue(methods.size() == 1);
+        Assertions.assertEquals("java.lang.String,int,java.nio.file.Path",
+                                Utils.getParameterListStr(methods.get(0)));
     }
 }

@@ -2,10 +2,12 @@ package com.luojl.demo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 public class Utils {
@@ -17,10 +19,10 @@ public class Utils {
             "\\[class:([\\w.]+).*\\[test-template:([\\w().]+).*\\[test-template-invocation:(#\\d)";
     private static final Pattern junit5ParameterizedPattern =
             Pattern.compile(junit5ParameterizedRegex);
-    private static final String junit5NestedRegex = "\\[class:([\\w.]+).*\\[nested-class:([\\w.]+).*\\[method:([\\w().]+)";
+    private static final String junit5NestedRegex = "\\[nested-class:([\\w.]+)\\]";
     private static final Pattern junit5NestedPattern = Pattern.compile(junit5NestedRegex);
-    private static final String junit5Regex = "\\[class:([\\w.]+).*\\[method:([\\w().]+)";
-    private static final Pattern junit5Pattern = Pattern.compile(junit5Regex);
+    private static final String junit5BasicRegex = "\\[class:([\\w.]+).*\\[method:([\\w().]+)";
+    private static final Pattern junit5BasicPattern = Pattern.compile(junit5BasicRegex);
     private static final String junit4Regex = "\\[test:(\\w+)\\(([\\w.]+)\\)";
     private static final Pattern junit4Pattern = Pattern.compile(junit4Regex);
 
@@ -48,6 +50,7 @@ public class Utils {
      * fully qualified name: com.luojl.demo.JUnit4DemoTest#TestA4
      */
     public static String toFullyQualifiedName(String identifierUniqueId) {
+        System.out.println(identifierUniqueId);
         Matcher matcher = junit5NestParameterizedPattern.matcher(identifierUniqueId);
         if (matcher.find()) {
             return matcher.group(1) + "$" + matcher.group(2) + "#" + matcher.group(3)
@@ -57,19 +60,31 @@ public class Utils {
         if (matcher.find()) {
             return matcher.group(1) + "#" + matcher.group(2) + matcher.group(3);
         }
-        matcher = junit5NestedPattern.matcher(identifierUniqueId);
+        matcher = junit5BasicPattern.matcher(identifierUniqueId);
         if (matcher.find()) {
-            return matcher.group(1) + "$" + matcher.group(2) + "#" + matcher.group(3);
-        }
-        matcher = junit5Pattern.matcher(identifierUniqueId);
-        if (matcher.find()) {
-            // found JUnit 5 pattern
-            return matcher.group(1) + "#" + matcher.group(2);
+            // found JUnit 5 basic pattern: class + method
+            StringBuilder sb = new StringBuilder();
+            sb.append(matcher.group(1));
+
+            Matcher nestedMatcher = junit5NestedPattern.matcher(identifierUniqueId);
+            while (nestedMatcher.find()) {
+                // found nested class
+                // may nest multiple layers
+                sb.append("$");
+                sb.append(nestedMatcher.group(1));
+            }
+
+            sb.append("#");
+            sb.append(matcher.group(2));
+            return sb.toString();
         }
         // fall back to JUnit 4
         matcher = junit4Pattern.matcher(identifierUniqueId);
-        matcher.find();
-        return matcher.group(2) + "#" + matcher.group(1);
+        if (matcher.find()) {
+            return matcher.group(2) + "#" + matcher.group(1);
+        }
+        throw new IllegalStateException(
+            "Fail to parse identifierUniqueId: " + identifierUniqueId);
     }
 
     public static List<Method> getAllMethods(Class clz) {
@@ -86,5 +101,11 @@ public class Utils {
             }
         }
         return methods;
+    }
+
+    public static String getParameterListStr(Method method) {
+        List<String> params = Arrays.asList(method.getParameterTypes()).stream()
+                .map(c -> c.getName()).collect(Collectors.toList());
+        return String.join(",", params);
     }
 }

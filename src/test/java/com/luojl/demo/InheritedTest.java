@@ -21,6 +21,15 @@ public class InheritedTest extends ParentTest {
     @Nested
     public class NestedTest {
 
+        @Nested
+        public class DoubleNestedTest {
+
+            @Test
+            void DoubleNestedTestA() {
+                System.out.println("DoubleNestedTestA");
+            }
+        }
+
         @Test
         void NestedTestA() {
             System.out.println("NestedTestA");

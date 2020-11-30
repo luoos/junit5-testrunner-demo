@@ -25,4 +25,10 @@ public class ParameterizedDemoTest {
         System.out.println("ParameterizedDemoTest#testB");
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {1})
+    void TestC(int i) {
+        System.out.println(i);
+    }
+
 }
